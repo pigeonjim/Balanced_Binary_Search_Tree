@@ -11,4 +11,15 @@ class Node
   def <=>(other)
     data <=> other.data
   end
+
+  def compare(other)
+    case self <=> other
+    when - 1
+      @right
+    when 0
+      nil
+    when 1
+      @left
+    end
+  end
 end
