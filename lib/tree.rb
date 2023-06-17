@@ -69,7 +69,7 @@ class Tree
     ObjectSpace._id2ref(next_addrs)
   end
 
-    def get_parent(value)
+  def get_parent(value)
     return if @root.data == value
 
     child_node = Node.new(value)
@@ -107,9 +107,24 @@ class Tree
     end
   end
 
-  def level_order_recur(a_node = @root, &block)
-    block.call(a_node)
-    level_order_recur(ObjectSpace._id2ref(a_node.left), &block) unless a_node.left.nil?
-    level_order_recur(ObjectSpace._id2ref(a_node.right), &block) unless a_node.right.nil?
+  def level_order_recur(level_ary = [], node, &block)
+    level_ary
+  end
+
+  def depth_first_preorder(a_node = [@root])
+    depth_ary = a_node
+    unless depth_ary[0].left.nil?
+      depth_ary.unshift(ObjectSpace._id2ref(depth_ary[0].left))
+      depth_first_preorder(depth_ary)
+    end
+    unless depth_ary[0].right.nil?
+      depth_ary.unshift(ObjectSpace._id2ref(depth_ary[0].right))
+      depth_first_preorder(depth_ary)
+    end
+    if block_given?
+      depth_ary.each { |node| yield node }
+    else
+      depth_ary
+    end
   end
 end
