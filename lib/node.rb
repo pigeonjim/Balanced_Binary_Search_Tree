@@ -9,7 +9,7 @@ class Node
   end
 
   def <=>(other)
-    data <=> other.data
+    @data <=> other.data
   end
 
   def compare(other)
@@ -17,7 +17,7 @@ class Node
     when - 1
       @right
     when 0
-      nil
+      0
     when 1
       @left
     end
