@@ -133,6 +133,7 @@ class Tree
     # LIFO - use stack
     # inline so print each node in Left - Self - Right
     return ary if a_node.nil?
+    
     a_node.left.nil? ? depth_first_inline(nil) : depth_first_inline(ObjectSpace._id2ref(a_node.left), ary, &block)
     yield a_node.data if block_given?
     ary.push a_node.data
