@@ -107,24 +107,47 @@ class Tree
     end
   end
 
-  def level_order_recur(level_ary = [], node, &block)
-    level_ary
+  def level_order_recur(q_ary = [root], &block)
+    # FIFO - use a queue
+    return if q_ary.empty?
+
+    q_ary.push ObjectSpace._id2ref(q_ary[0].left) unless q_ary[0].left.nil?
+    q_ary.push ObjectSpace._id2ref(q_ary[0].right) unless q_ary[0].right.nil?
+    yield q_ary.shift
+    level_order_recur(q_ary, &block)
   end
 
-  def depth_first_preorder(a_node = [@root])
-    depth_ary = a_node
-    unless depth_ary[0].left.nil?
-      depth_ary.unshift(ObjectSpace._id2ref(depth_ary[0].left))
-      depth_first_preorder(depth_ary)
-    end
-    unless depth_ary[0].right.nil?
-      depth_ary.unshift(ObjectSpace._id2ref(depth_ary[0].right))
-      depth_first_preorder(depth_ary)
-    end
-    if block_given?
-      depth_ary.each { |node| yield node }
-    else
-      depth_ary
-    end
+  def depth_first_pre(a_node = @root, ary = [], &block)
+    # LIFO - use stack
+    # pre so print each node in Self - Left - Right
+    return ary if a_node.nil?
+
+    yield a_node.data if block_given?
+    ary.push a_node.data
+    a_node.left.nil? ? depth_first_pre(nil) : depth_first_pre(ObjectSpace._id2ref(a_node.left), ary, &block)
+    a_node.right.nil? ? depth_first_pre(nil) : depth_first_pre(ObjectSpace._id2ref(a_node.right), ary, &block)
+    return ary
+  end
+
+  def depth_first_inline(a_node = @root, ary = [], &block)
+    # LIFO - use stack
+    # inline so print each node in Left - Self - Right
+    return ary if a_node.nil?
+    a_node.left.nil? ? depth_first_inline(nil) : depth_first_inline(ObjectSpace._id2ref(a_node.left), ary, &block)
+    yield a_node.data if block_given?
+    ary.push a_node.data
+    a_node.right.nil? ? depth_first_inline(nil) : depth_first_inline(ObjectSpace._id2ref(a_node.right), ary, &block)
+    return ary
+  end
+
+  def depth_first_post(a_node = @root, ary = [], &block)
+    # LIFO - use stack
+    # post so print each node in Left - Right - Self
+    return ary if a_node.nil?
+
+    a_node.left.nil? ? depth_first_post(nil) : depth_first_post(ObjectSpace._id2ref(a_node.left), ary, &block)
+    a_node.right.nil? ? depth_first_post(nil) : depth_first_post(ObjectSpace._id2ref(a_node.right), ary, &block)
+    yield a_node.data if block_given?
+    ary.push a_node.data
   end
 end
