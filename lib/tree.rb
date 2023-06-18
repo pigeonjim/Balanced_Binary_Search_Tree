@@ -55,10 +55,10 @@ class Tree
     parent_node = get_parent(bye_node.data)
     replacement = get_lowest_RHS_Node(bye_node)
     lowest_parent = get_parent(replacement.data)
-    replacement.right = bye_node.right
+    replacement.right = bye_node.right unless lowest_parent == bye_node
     replacement.left = bye_node.left
-    parent_node.right == bye_node.object_id ? parent_node.right = replacement.object_id : parent_node.left =replacement.object_id
-    lowest_parent.left = nil
+    parent_node.right == bye_node.object_id ? parent_node.right = replacement.object_id : parent_node.left = replacement.object_id
+    lowest_parent.left = nil unless lowest_parent == bye_node
   end
 
   def get_lowest_RHS_Node(a_node)
@@ -149,5 +149,33 @@ class Tree
     a_node.right.nil? ? depth_first_post(nil) : depth_first_post(ObjectSpace._id2ref(a_node.right), ary, &block)
     yield a_node.data if block_given?
     ary.push a_node.data
+  end
+
+  def height?(a_node)
+    return 0 if a_node.nil?
+    return 0 if leaf?(a_node)
+
+    l_height = a_node.left.nil? ? 0 : height?(ObjectSpace._id2ref(a_node.left))
+    r_height = a_node.right.nil? ? 0 : height?(ObjectSpace._id2ref(a_node.right))
+
+    l_height < r_height ? (return r_height + 1) : (return l_height + 1)
+  end
+
+  def leaf?(a_node)
+    a_node.left.nil? && a_node.right.nil?
+  end
+
+  def depth(a_node)
+    height?(@root) - height?(a_node)
+  end
+
+  def balanced
+    differnce = height?(ObjectSpace._id2ref(@root.left)) - height?(ObjectSpace._id2ref(@root.right))
+    differnce.abs <= 1
+  end
+
+  def rebalance
+    @data = depth_first_inline
+    @root = build_tree(@data)
   end
 end
